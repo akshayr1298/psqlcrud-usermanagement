@@ -44,7 +44,6 @@ export const signUp = async (
   }
 };
 
-console.log("jwt", process.env.JWT_SECRET);
 export const signIn = async (
   req: Request,
   res: Response,
