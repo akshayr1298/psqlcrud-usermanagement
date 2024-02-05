@@ -1,5 +1,5 @@
 import express from 'express';
-import authRouter from './userRoutes'
+import authRouter from './authRoutes'
 
 
 /**

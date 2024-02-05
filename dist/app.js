@@ -37,9 +37,8 @@ const Routes = __importStar(require("./routes"));
 const databaseConfig_1 = __importDefault(require("./utils/database/databaseConfig"));
 const logger_1 = __importDefault(require("./utils/logger/logger"));
 dotenv_1.default.config();
-const origin = process.env.ORIGIN;
 const app = (0, express_1.default)();
-Routes.init(app);
+const origin = process.env.ORIGIN;
 app.use((0, morgan_1.default)("dev"));
 app.use((0, helmet_1.default)());
 app.use((0, cookie_parser_1.default)());
@@ -58,9 +57,11 @@ databaseConfig_1.default
     logger_1.default.info("database is connected");
 })
     .catch((error) => logger_1.default.error("Error connecting to the database", error));
+/*application middleware config in routes */
 app.get("/", (req, res) => {
     console.log('server is running');
 });
+Routes.init(app);
 // error handling-middleware
 app.use((req, res, next) => {
     const error = new Error("NOT FOUND");
@@ -79,7 +80,7 @@ app.use((err, req, res, next) => {
         stack: err.stack,
     });
 });
-const port = process.env.PORT || 4500;
+const port = process.env.PORT || 8505;
 app.listen(port, () => {
     logger_1.default.info(`[server]: Server is running at port:${port}`);
 });
