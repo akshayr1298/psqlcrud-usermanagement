@@ -1,16 +1,16 @@
 import jwt from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express";
-import statusCodes from "@utils/http/statusCode";
+import statusCodes from "../http/statusCode";
 
-export const verifyToken = (
+const auth = (
   req: Request | any,
   res: Response,
   next: NextFunction
 ): Response | void => {
   try {
     console.log("cookies", req.cookies);
-    const token = req.cookies.access_token;
-    const refreshToken = req.cookies.refresh_token;
+    const token = req.cookies.accessToken;
+    const refreshToken = req.cookies.refreshToken;
     console.log("token", token, "refresh", refreshToken);
     if (!token) {
       return res
@@ -64,3 +64,5 @@ export const verifyToken = (
     next(error);
   }
 };
+
+export default auth;

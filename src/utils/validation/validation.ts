@@ -28,3 +28,17 @@ export const signInSchmea = Joi.object({
     "string.empty": "password is required",
   }),
 });
+
+export const editProfileSchema = Joi.object({
+  id: Joi.string().required().messages({
+    "string.empty": "id is required",
+  }),
+  name: Joi.string().min(6).required().messages({
+    "string.min": "Password must be at least {#limit} characters long",
+    "string.empty": "password is required",
+  }),
+  phoneNumber: Joi.string().min(10).required().messages({
+    "string.min": "Phone number must be at least {#limit} characters long",
+    "string.empty": "Phone number is required",
+  }),
+});
