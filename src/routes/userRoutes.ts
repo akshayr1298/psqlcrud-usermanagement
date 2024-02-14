@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { editProfile, getProfile } from "../controller/userController";
+import {
+  addAddress,
+  editProfile,
+  getProfile,
+} from "../controller/userController";
 
 /**
  * @constant {express.Router}
@@ -7,11 +11,11 @@ import { editProfile, getProfile } from "../controller/userController";
 const router: Router = Router();
 
 /* POST request */
+router.post("/add/address", addAddress);
 
-router.get('/profile', getProfile)
-router.patch('/edit/:id',editProfile)
+router.get("/profile", getProfile);
 
-
+router.patch("/edit/:id", editProfile);
 
 /**
  * @export {express.Router}

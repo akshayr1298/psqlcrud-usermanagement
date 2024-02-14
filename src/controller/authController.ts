@@ -59,6 +59,10 @@ export const signIn = async (
     }
     const response = await authService.signIn(email, password);
     let secret: string | any = process.env.JWT_SECRET;
+    let session: any = req.session;
+        session.userId = response.id;
+        console.log('session', req.session);
+
     const token = jwt.sign({ userId:response.id, eamil: response.email }, secret, {
       expiresIn: "15m",
     });
@@ -89,10 +93,17 @@ export const logOut = (req: Request, res: Response, next: NextFunction) => {
     console.log("cookie", req.cookies);
     res.clearCookie("accessToken");
     res.clearCookie("refreshToken");
+    
     console.log("clear-cookie", req.cookies);
-    return res
-      .status(statusCodes.SUCCESS)
-      .json({ message: "Log out successfully", success: true, code: 200 });
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('Error destroying session:', err);
+      }
+      res.clearCookie('connect.sid');
+      return res
+        .status(statusCodes.SUCCESS)
+        .json({ message: 'Logout successfully' });
+    });
   } catch (error: any) {
     return res
       .status(statusCodes.BAD_REQUEST)
