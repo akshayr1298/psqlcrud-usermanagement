@@ -1,16 +1,19 @@
 import jwt from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express";
-import statusCodes from "@utils/http/statusCode";
+import statusCodes from "../http/statusCode";
 
-export const verifyToken = (
+const auth = (
   req: Request | any,
   res: Response,
   next: NextFunction
 ): Response | void => {
   try {
-    console.log("cookies", req.cookies);
-    const token = req.cookies.access_token;
-    const refreshToken = req.cookies.refresh_token;
+    const token = req.cookies.accessToken;
+    const refreshToken = req.cookies.refreshToken;
+    console.log('your session ',req.session);
+    if(!req.session.userId){
+      return res.status(statusCodes.UNAUTHORIZED).json({message: 'Your session is expired'});
+    }
     console.log("token", token, "refresh", refreshToken);
     if (!token) {
       return res
@@ -18,9 +21,7 @@ export const verifyToken = (
         .json({ message: "You are not authenticated" });
     }
     let secret: string | any = process.env.JWT_SECRET;
-    // type UserType = {
-    //     email: string;
-    //   };
+   
     jwt.verify(token, secret, (err: any, user: any) => {
       console.log("user", user);
 
@@ -41,7 +42,7 @@ export const verifyToken = (
             });
 
             // Set the new access token in the response cookies
-            res.cookie("access_token", newAccessToken, {
+            res.cookie("accessToken", newAccessToken, {
               maxAge: 600000,
               httpOnly: true,
             });
@@ -64,3 +65,5 @@ export const verifyToken = (
     next(error);
   }
 };
+
+export default auth;

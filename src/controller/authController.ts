@@ -59,22 +59,27 @@ export const signIn = async (
     }
     const response = await authService.signIn(email, password);
     let secret: string | any = process.env.JWT_SECRET;
-    const token = jwt.sign({ eamil: response.email }, secret, {
+    let session: any = req.session;
+        session.userId = response.id;
+        console.log('session', req.session);
+
+    const token = jwt.sign({ userId:response.id, eamil: response.email }, secret, {
       expiresIn: "15m",
     });
-    const refreshToken = jwt.sign({ eamil: response.email }, secret, {
+    const refreshToken = jwt.sign({ userId:response.id, email: response.email }, secret, {
       expiresIn: "7d",
     });
 
-    res.cookie("access_token", token, { maxAge: 600000, httpOnly: true });
-    res.cookie("refresh_token", refreshToken, { httpOnly: true });
+    res.cookie("accessToken", token, { maxAge: 600000, httpOnly: true, secure: false });
+    res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: false });
+    
     res.status(statusCodes.SUCCESS).json({
       message: "Successfully logged in",
       success: true,
       code: 200,
       data: response,
-      access_token: token,
-      refresh_token: refreshToken,
+      accessToken: token,
+      refreshToken: refreshToken,
     });
   } catch (error: any) {
     return res
@@ -86,12 +91,19 @@ export const signIn = async (
 export const logOut = (req: Request, res: Response, next: NextFunction) => {
   try {
     console.log("cookie", req.cookies);
-    res.clearCookie("access_token");
-    res.clearCookie("refresh_token");
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+    
     console.log("clear-cookie", req.cookies);
-    return res
-      .status(statusCodes.SUCCESS)
-      .json({ message: "Log out successfully", success: true, code: 200 });
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('Error destroying session:', err);
+      }
+      res.clearCookie('connect.sid');
+      return res
+        .status(statusCodes.SUCCESS)
+        .json({ message: 'Logout successfully' });
+    });
   } catch (error: any) {
     return res
       .status(statusCodes.BAD_REQUEST)

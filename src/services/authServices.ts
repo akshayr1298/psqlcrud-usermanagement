@@ -37,12 +37,13 @@ const authService = {
   async signIn(email: string, password: string) {
     try {
       type UserCredentials = {
+        id:string;
         name: string;
         email: string;
         password: string;
       };
       const result: QueryResult<UserCredentials> = await pool.query(
-        "SELECT name,email,password FROM users WHERE email = $1",
+        "SELECT id,name,email,password FROM users WHERE email = $1",
         [email]
       );
       const user: UserCredentials = result.rows[0];
