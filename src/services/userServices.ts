@@ -10,14 +10,15 @@ const userServices = {
       // const user = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
       const user = await pool.query(
         `
-  SELECT users.id, users.name, users.email,users.phone_number, address.country, address.state, address.city, address.postal_code, address.street_address, address.landmark
+  SELECT users.id, users.name, users.email,users.phone_number, address.*
   FROM users
-  JOIN address ON users.id = address.user_id
+  LEFT JOIN address ON users.id = address.user_id
   WHERE users.id = $1`,
         [id]
       );
+      
 
-      return user.rows[0];
+      return user.rows;
     } catch (error: any) {
       throw new Error(error);
     }
