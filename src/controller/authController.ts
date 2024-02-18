@@ -64,13 +64,13 @@ export const signIn = async (
         console.log('session', req.session);
 
     const token = jwt.sign({ userId:response.id, eamil: response.email }, secret, {
-      expiresIn: "15m",
+      expiresIn: '15m'
     });
     const refreshToken = jwt.sign({ userId:response.id, email: response.email }, secret, {
       expiresIn: "7d",
     });
 
-    res.cookie("accessToken", token, { maxAge: 600000, httpOnly: true, secure: false });
+    res.cookie("accessToken", token, { maxAge: 86400000, httpOnly: true, secure: false });
     res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: false });
     
     res.status(statusCodes.SUCCESS).json({

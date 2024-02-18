@@ -23,7 +23,7 @@ app.use(
     secret: secret,
     saveUninitialized: false,
     resave: false,
-    cookie: { secure: false, maxAge: 3600000  },
+    cookie: { secure: false, maxAge: 86400000  },
   })
 );
 app.use(cookieParser());
