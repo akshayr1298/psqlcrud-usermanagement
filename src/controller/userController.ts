@@ -6,15 +6,13 @@ import {
 } from "../utils/validation/validation";
 import userServices from "../services/userServices";
 
-
 /**
- * 
- * @param {Request} req 
- * @param {Response} res 
- * @param {NextFunction} next 
+ *
+ * @param {Request} req
+ * @param {Response} res
+ * @param {NextFunction} next
  * @returns {Promise<any>}
  */
-
 
 export const getProfile = async (
   req: Request | any,
@@ -38,10 +36,10 @@ export const getProfile = async (
 };
 
 /**
- * 
- * @param {Request} req 
- * @param {Response} res 
- * @param {NextFunction} next 
+ *
+ * @param {Request} req
+ * @param {Response} res
+ * @param {NextFunction} next
  * @returns {Promise<any>}
  */
 
@@ -53,7 +51,7 @@ export const editProfile = async (
   try {
     const { id } = req.params;
     const { name, phoneNumber } = req.body;
-    const { error } = editProfileSchema.validate({
+    const { error }: any = editProfileSchema.validate({
       id,
       name,
       phoneNumber,
@@ -80,14 +78,14 @@ export const editProfile = async (
 };
 
 /**
- * 
- * @param {Request} req 
- * @param {Response} res 
- * @param {NextFunction} next 
+ *
+ * @param {Request} req
+ * @param {Response} res
+ * @param {NextFunction} next
  * @returns {Promise<any>}
  */
 
-export const addAddress = async(
+export const addAddress = async (
   req: Request | any,
   res: Response,
   next: NextFunction
@@ -96,7 +94,7 @@ export const addAddress = async(
     const { userId } = req.user;
     const { country, state, city, postalcode, streetaddress, landmark } =
       req.body;
-    const { error } = addressValidation.validate({
+    const { error }: any = addressValidation.validate({
       country,
       state,
       city,
@@ -109,7 +107,7 @@ export const addAddress = async(
         .status(statusCodes.BAD_REQUEST)
         .json({ message: error.details[0].message, success: false, code: 400 });
     }
-    const response = await userServices.addAddress(userId,req.body);
+    const response = await userServices.addAddress(userId, req.body);
     return res.status(statusCodes.BAD_REQUEST).json({
       message: "Address addedd successfully",
       success: true,

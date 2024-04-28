@@ -6,7 +6,7 @@ import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import * as Routes from "./routes";
-import pool from "./utils/database/databaseConfig";
+import pool from "./config/database/databaseConfig";
 import Logger from "./utils/logger/logger";
 import session from "express-session";
 
@@ -23,7 +23,7 @@ app.use(
     secret: secret,
     saveUninitialized: false,
     resave: false,
-    cookie: { secure: false, maxAge: 3600000  },
+    cookie: { secure: false, maxAge: 86400000  },
   })
 );
 app.use(cookieParser());

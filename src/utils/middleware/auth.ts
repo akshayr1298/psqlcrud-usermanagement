@@ -10,7 +10,7 @@ const auth = (
   try {
     const token = req.cookies.accessToken;
     const refreshToken = req.cookies.refreshToken;
-    console.log('your session ',req.session);
+    console.log('your session ',req.session,token);
     if(!req.session.userId){
       return res.status(statusCodes.UNAUTHORIZED).json({message: 'Your session is expired'});
     }
@@ -43,7 +43,7 @@ const auth = (
 
             // Set the new access token in the response cookies
             res.cookie("accessToken", newAccessToken, {
-              maxAge: 600000,
+              maxAge: 86400000,
               httpOnly: true,
             });
 
