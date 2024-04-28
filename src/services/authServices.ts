@@ -1,4 +1,5 @@
-import pool from "../utils/database/databaseConfig";
+import AppError from "../utils/error/error";
+import pool from "../config/database/databaseConfig";
 import bcrypt from "bcrypt";
 import { QueryResult } from "pg";
 
@@ -19,7 +20,11 @@ const authService = {
       const { user_exists } = userExist.rows[0];
 
       if (user_exists) {
-        throw new Error("This email is already registered try another email");
+        throw new AppError(
+          400,
+          "This email is already registered try another email",
+          400
+        );
       }
 
       const hashedPassword: string = await bcrypt.hash(password, 10);
@@ -30,14 +35,19 @@ const authService = {
       const data = users.rows[0];
       return data;
     } catch (error: any) {
-      throw new Error(error);
+      if (error instanceof AppError) {
+        throw error;
+      } else {
+        console.error("error", error); // Log the error for debugging
+        throw new AppError(500, "Internal Server Error", 500);
+      }
     }
   },
 
   async signIn(email: string, password: string) {
     try {
       type UserCredentials = {
-        id:string;
+        id: string;
         name: string;
         email: string;
         password: string;
@@ -48,16 +58,21 @@ const authService = {
       );
       const user: UserCredentials = result.rows[0];
       if (!user) {
-        throw new Error("Invalid email");
+        throw new AppError(400, "Invalid email", 400);
       }
       const passwordMatch = await bcrypt.compare(password, user.password);
       if (!passwordMatch) {
-        throw new Error("Invalid email");
+        throw new AppError(400, "Invalid password", 400);
       }
 
       return user;
     } catch (error: any) {
-      throw new Error(error);
+      if (error instanceof AppError) {
+        throw error;
+      } else {
+        console.error("error", error); // Log the error for debugging
+        throw new AppError(500, "Internal Server Error", 500);
+      }
     }
   },
 };

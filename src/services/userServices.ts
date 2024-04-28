@@ -1,4 +1,6 @@
-import pool from "../utils/database/databaseConfig";
+
+import AppError from "../utils/error/error";
+import pool from "../config/database/databaseConfig";
 
 /**
  *  @param {string} id
@@ -17,10 +19,14 @@ const userServices = {
         [id]
       );
       
-
       return user.rows;
     } catch (error: any) {
-      throw new Error(error);
+      if (error instanceof AppError) {
+        throw error;
+      } else {
+        console.error("error", error); // Log the error for debugging
+        throw new AppError(500, "Internal Server Error", 500);
+      }
     }
   },
 
@@ -40,7 +46,12 @@ const userServices = {
       );
       return updateProfile;
     } catch (error: any) {
-      throw new Error(error);
+      if (error instanceof AppError) {
+        throw error;
+      } else {
+        console.error("error", error); // Log the error for debugging
+        throw new AppError(500, "Internal Server Error", 500);
+      }
     }
   },
 
@@ -52,17 +63,6 @@ const userServices = {
   async addAddress(userid: string, body: any) {
     const { country, state, city, postalcode, streetaddress, landmark } = body;
     try {
-      console.log(
-        "data",
-        userid,
-        country,
-        state,
-        city,
-        postalcode,
-        streetaddress,
-        landmark
-      );
-
       const insert = await pool.query(
         "INSERT INTO address (user_id,country, state, city, postal_code, street_address, landmark) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING *",
         [userid, country, state, city, postalcode, streetaddress, landmark]
@@ -70,8 +70,12 @@ const userServices = {
       return insert.rows[0];
     } catch (error: any) {
       console.log("error", error);
-
-      throw new Error(error);
+      if (error instanceof AppError) {
+        throw error;
+      } else {
+        console.error("error", error); // Log the error for debugging
+        throw new AppError(500, "Internal Server Error", 500);
+      }
     }
   },
 };

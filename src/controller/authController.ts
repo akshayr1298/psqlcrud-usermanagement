@@ -3,6 +3,7 @@ import statusCodes from "../utils/http/statusCode";
 import authService from "../services/authServices";
 import { signInSchmea, signupSchema } from "../utils/validation/validation";
 import jwt from "jsonwebtoken";
+import AppError from "../utils/error/error";
 
 /**
  *
@@ -38,9 +39,15 @@ export const signUp = async (
       data: user,
     });
   } catch (error: any) {
+    let statusCode = 500;
+    let message = "Internal Server Error";
+    if (error instanceof AppError) {
+      statusCode = error.statusCode;
+      message = error.message;
+    }
     return res
-      .status(statusCodes.BAD_REQUEST)
-      .json({ message: error.message, success: false, code: 400 });
+      .status(statusCode)
+      .json({ message, success: false, code: statusCode });
   }
 };
 
@@ -60,19 +67,31 @@ export const signIn = async (
     const response = await authService.signIn(email, password);
     let secret: string | any = process.env.JWT_SECRET;
     let session: any = req.session;
-        session.userId = response.id;
-        console.log('session', req.session);
+    session.userId = response.id;
+    console.log("session", req.session);
 
-    const token = jwt.sign({ userId:response.id, eamil: response.email }, secret, {
-      expiresIn: '15m'
-    });
-    const refreshToken = jwt.sign({ userId:response.id, email: response.email }, secret, {
-      expiresIn: "7d",
-    });
+    const token = jwt.sign(
+      { userId: response.id, eamil: response.email },
+      secret,
+      {
+        expiresIn: "15m",
+      }
+    );
+    const refreshToken = jwt.sign(
+      { userId: response.id, email: response.email },
+      secret,
+      {
+        expiresIn: "7d",
+      }
+    );
 
-    res.cookie("accessToken", token, { maxAge: 86400000, httpOnly: true, secure: false });
+    res.cookie("accessToken", token, {
+      maxAge: 86400000,
+      httpOnly: true,
+      secure: false,
+    });
     res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: false });
-    
+
     res.status(statusCodes.SUCCESS).json({
       message: "Successfully logged in",
       success: true,
@@ -82,9 +101,15 @@ export const signIn = async (
       refreshToken: refreshToken,
     });
   } catch (error: any) {
+    let statusCode = 500;
+    let message = "Internal Server Error";
+    if (error instanceof AppError) {
+      statusCode = error.statusCode;
+      message = error.message;
+    }
     return res
-      .status(statusCodes.BAD_REQUEST)
-      .json({ message: error.message, success: false, code: 400 });
+      .status(statusCode)
+      .json({ message, success: false, code: statusCode });
   }
 };
 
@@ -93,16 +118,16 @@ export const logOut = (req: Request, res: Response, next: NextFunction) => {
     console.log("cookie", req.cookies);
     res.clearCookie("accessToken");
     res.clearCookie("refreshToken");
-    
+
     console.log("clear-cookie", req.cookies);
     req.session.destroy((err) => {
       if (err) {
-        console.error('Error destroying session:', err);
+        console.error("Error destroying session:", err);
       }
-      res.clearCookie('connect.sid');
+      res.clearCookie("connect.sid");
       return res
         .status(statusCodes.SUCCESS)
-        .json({ message: 'Logout successfully' });
+        .json({ message: "Logout successfully" });
     });
   } catch (error: any) {
     return res
